@@ -17,36 +17,64 @@ const Sortable = function(el, options) {
         }
     }
     // bind some events
-    _bind(el, 'mousedown', this._onMouseDown)
-    _bind(el, 'dragover', this)
-    _bind(el, 'dragenter', this)
+    $bind(el, 'mousedown', this._onMouseDown)
+    $bind(el, 'dragover', this)
+    $bind(el, 'dragenter', this)
 
 }
 Sortable.prototype = {
     constructor: Sortable, //TODO: why???
     _onMouseDown: function(ev) {
-        let _self = this
         let el = this.el
         let options = this.options
         let target = ev.target
+        let startIndex
         if (options.disabled) {
             return
         }
-        target = _closest(target, el)
-        console.log(target)
+        target = $closest(target, el)
+        if (!target) {
+            return
+        }
+        startIndex = $index(target)
+        this._prepareDragStart(ev, target, startIndex)
+    },
+    _prepareDragStart: function(ev, target, startIndex) {
+        let el = this.el
+        let options = this.options
+        let ownerDocument = el.ownerDocument
+        let dragStartFn
+        if (target && (target.parentNode === el)) {
+            let rootEl = el
+            let dragEl = target
+            let parentEl = dragEl.parentNode
+            let nextEl = dragEl.nextSibing
+            let oldIndex = startIndex
+        }
     }
 }
 Sortable.create = function(el, options = {}) {
     return new Sortable(el, options)
 }
 
-function _bind(el, event, fn) {
+function $bind(el, event, fn) {
     el.addEventListener(event, fn, false)
 }
-function _closest(el, ctx) {
+function $closest(el, ctx) {
     if (el) {
         return el
     }
     return null
+}
+function $index(el) {
+    let index = 0
+    if (!el || !el.parentNode) {
+        return -1
+    }
+    while(el) {
+        index++
+        el = el.previousElementSibling
+    }
+    return index
 }
 export { Sortable }
